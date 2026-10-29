@@ -6,6 +6,7 @@ import { formatFriendlyDate, normalizeUrl } from '../../utils/dateUtils';
 import { CatPriorityBadge } from '../Cat/CatPriorityBadge';
 import { CatPrioritySelector } from '../Cat/CatPrioritySelector';
 import { CatPawIcon } from '../Cat/CatIcon';
+import { CatAvatar } from '../Cat/CatAvatar';
 import {
   Target,
   Plus,
@@ -698,10 +699,11 @@ export const FutureTasksView: React.FC<FutureTasksViewProps> = ({
         <div className="bg-gradient-to-br from-indigo-50/60 to-pink-50/40 border border-indigo-100 rounded-2xl p-4 text-xs text-slate-600 space-y-2">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-xl bg-white shadow-xs p-1 border border-indigo-100 shrink-0 overflow-hidden">
-              <img
-                src="/public/assets/aistudio/WhatsApp_Image_2026-10-28_at_23.00.58_152122ae.jpeg"
+              <CatAvatar
                 alt="Mascote StudyDay"
                 className="w-full h-full object-cover rounded-lg"
+                fallbackPriority="calm"
+                fallbackSize={36}
               />
             </div>
             <div>

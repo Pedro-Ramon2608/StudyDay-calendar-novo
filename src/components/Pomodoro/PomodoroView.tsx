@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { CatIcon, CatPawIcon } from '../Cat/CatIcon';
+import { CatAvatar } from '../Cat/CatAvatar';
 import { playCatMeowSound } from '../../utils/audioUtils';
 import {
   Play,
@@ -173,16 +174,17 @@ export const PomodoroView: React.FC = () => {
         <div className="flex flex-col items-center justify-center space-y-2">
           <div className="relative group cursor-pointer" onClick={() => playCatMeowSound()} title="Clique para ouvir o miado do gatinho!">
             <div
-              className={`w-28 h-28 rounded-full border-4 flex items-center justify-center p-2 shadow-inner transition-all transform group-hover:scale-105 ${
+              className={`w-28 h-28 rounded-full border-4 flex items-center justify-center p-1 shadow-inner transition-all transform group-hover:scale-105 overflow-hidden ${
                 mode === 'focus'
                   ? 'bg-indigo-50/60 border-indigo-200'
                   : 'bg-emerald-50/60 border-emerald-200'
               }`}
             >
-              <img
-                src="/public/assets/aistudio/WhatsApp_Image_2026-10-28_at_23.00.58_152122ae.jpeg"
+              <CatAvatar
                 alt="Gatinho Pomodoro"
                 className="w-full h-full object-cover rounded-full"
+                fallbackPriority={mode === 'focus' ? 'alert' : 'calm'}
+                fallbackSize={80}
               />
             </div>
             {/* Patinha indicadora de estado */}

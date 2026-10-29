@@ -12,6 +12,7 @@ import { FutureTasksView } from './components/FutureTasks/FutureTasksView';
 import { CatPawEffect } from './components/Cat/CatPawEffect';
 import { AuthModal } from './components/Auth/AuthModal';
 import { CatIcon, CatPawIcon } from './components/Cat/CatIcon';
+import { CatAvatar } from './components/Cat/CatAvatar';
 
 function StudyDayMain() {
   const [activeTab, setActiveTab] = useState<ActiveTab>('calendar');
@@ -92,10 +93,11 @@ function StudyDayMain() {
           <div className="mb-6 p-3.5 bg-gradient-to-r from-indigo-50/90 to-pink-50/70 border border-indigo-100/90 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3 text-xs shadow-xs">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-white p-1 border border-indigo-100 shrink-0 overflow-hidden shadow-2xs">
-                <img
-                  src="/public/assets/aistudio/WhatsApp_Image_2026-10-28_at_23.00.58_152122ae.jpeg"
+                <CatAvatar
                   alt="Gatinho StudyDay"
                   className="w-full h-full object-cover rounded-lg"
+                  fallbackPriority="calm"
+                  fallbackSize={32}
                 />
               </div>
               <div>

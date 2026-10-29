@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import { ActiveTab, AppStorageState } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { CatIcon, CatPawIcon } from './Cat/CatIcon';
+import { CatAvatar } from './Cat/CatAvatar';
 import {
   CalendarDays,
   CalendarRange,
@@ -63,14 +64,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Zone 1: Brand Wordmark com Mascote */}
           <div className="flex items-center gap-2.5 shrink-0">
             <div className="w-10 h-10 rounded-xl bg-white border border-indigo-100 shadow-xs flex items-center justify-center overflow-hidden shrink-0">
-              <img
-                src="/public/assets/aistudio/WhatsApp_Image_2026-10-28_at_23.00.58_152122ae.jpeg"
-                alt="StudyDay Cat"
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  (e.currentTarget as HTMLElement).style.display = 'none';
-                }}
-              />
+              <CatAvatar alt="StudyDay Mascote" fallbackPriority="calm" fallbackSize={32} />
             </div>
             <div className="flex items-baseline gap-1.5">
               <span className="text-xl font-bold tracking-tight text-slate-900 whitespace-nowrap flex items-center gap-1">

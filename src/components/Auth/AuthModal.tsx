@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { CatIcon, CatPawIcon } from '../Cat/CatIcon';
+import { CatAvatar } from '../Cat/CatAvatar';
 import { LogIn, UserPlus, KeyRound, Mail, User, Sparkles, X, AlertCircle } from 'lucide-react';
 
 interface AuthModalProps {
@@ -92,14 +93,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           )}
 
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white shadow-xs border border-indigo-100 mb-2 overflow-hidden">
-            <img
-              src="/public/assets/aistudio/WhatsApp_Image_2026-10-28_at_23.00.58_152122ae.jpeg"
+            <CatAvatar
               alt="Mascote StudyDay"
               className="w-full h-full object-cover"
-              onError={(e) => {
-                // Fallback caso a imagem não carregue
-                (e.currentTarget as HTMLElement).style.display = 'none';
-              }}
+              fallbackPriority="calm"
+              fallbackSize={48}
             />
           </div>
 

@@ -145,8 +145,13 @@ async function startServer() {
   });
 
   // === VITE / STATIC MIDDLEWARES ===
+  // Servir pasta public para desenvolvimento e produção
+  app.use('/public', express.static(path.resolve(__dirname, 'public')));
+  app.use(express.static(path.resolve(__dirname, 'public')));
+
   if (process.env.NODE_ENV === 'production') {
     app.use(express.static(path.resolve(__dirname, 'dist')));
+    app.use('/public', express.static(path.resolve(__dirname, 'dist')));
     app.get('*', (_req, res) => {
       res.sendFile(path.resolve(__dirname, 'dist', 'index.html'));
     });
