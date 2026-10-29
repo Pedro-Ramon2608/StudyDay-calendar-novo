@@ -1,0 +1,6 @@
+{
+  "name": "StudyDay - Organizador de Estudos",
+  "description": "Aplicação minimalista e confortável para organização diária de estudos, backlog de metas e repositório de links úteis.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
