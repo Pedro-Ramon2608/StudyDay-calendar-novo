@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import catMascotImgImport from '../../assets/cat-mascot.jpeg';
 import { CatIcon } from './CatIcon';
 import { TaskPriority } from '../../types';
 
 // Mascote oficial StudyDay (O gatinho da imagem de referência: public/assets/cat-mascot.jpeg)
 export const DEFAULT_CAT_MASCOT_URL = '/assets/cat-mascot.jpeg';
-export const catMascotImg = catMascotImgImport || DEFAULT_CAT_MASCOT_URL;
+export const catMascotImg = DEFAULT_CAT_MASCOT_URL;
 export const CAT_MASCOT_BASE64 = catMascotImg;
 
 interface CatAvatarProps {
