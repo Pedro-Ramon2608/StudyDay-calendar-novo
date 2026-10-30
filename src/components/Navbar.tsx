@@ -63,8 +63,8 @@ export const Navbar: React.FC<NavbarProps> = ({
         <div className="flex items-center justify-between gap-2 sm:gap-4 h-16">
           {/* Zone 1: Brand Wordmark com Mascote */}
           <div className="flex items-center gap-2.5 shrink-0">
-            <div className="w-10 h-10 rounded-xl bg-white border border-indigo-100 shadow-xs flex items-center justify-center overflow-hidden shrink-0">
-              <CatAvatar alt="StudyDay Mascote" fallbackPriority="calm" fallbackSize={32} />
+            <div className="relative w-10 h-10 rounded-xl bg-white border border-indigo-100 shadow-xs flex items-center justify-center shrink-0 overflow-hidden p-0.5">
+              <CatAvatar alt="StudyDay Mascote" className="w-full h-full object-contain" />
             </div>
             <div className="flex items-baseline gap-1.5">
               <span className="text-xl font-bold tracking-tight text-slate-900 whitespace-nowrap flex items-center gap-1">

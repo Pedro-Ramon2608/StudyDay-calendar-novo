@@ -92,12 +92,10 @@ function StudyDayMain() {
         {!user && (
           <div className="mb-6 p-3.5 bg-gradient-to-r from-indigo-50/90 to-pink-50/70 border border-indigo-100/90 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3 text-xs shadow-xs">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-white p-1 border border-indigo-100 shrink-0 overflow-hidden shadow-2xs">
+              <div className="relative w-10 h-10 rounded-xl bg-white p-0.5 border border-indigo-100 shrink-0 flex items-center justify-center shadow-2xs overflow-hidden">
                 <CatAvatar
                   alt="Gatinho StudyDay"
-                  className="w-full h-full object-cover rounded-lg"
-                  fallbackPriority="calm"
-                  fallbackSize={32}
+                  className="w-full h-full object-contain"
                 />
               </div>
               <div>

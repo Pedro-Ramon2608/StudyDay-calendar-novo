@@ -11,9 +11,13 @@ import {
   deleteSession,
   getUserStudyState,
   saveUserStudyState,
-  isUsingPostgres,
 } from './server/db';
 import { User } from './src/types';
+
+// Detecta se PostgreSQL está configurado via variáveis de ambiente
+const isUsingPostgres = Boolean(
+  process.env.DATABASE_URL || process.env.POSTGRES_URL || process.env.INTERNAL_DATABASE_URL
+);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

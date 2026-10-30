@@ -182,7 +182,7 @@ export const PomodoroView: React.FC = () => {
             >
               <CatAvatar
                 alt="Gatinho Pomodoro"
-                className="w-full h-full object-cover rounded-full"
+                className="w-full h-full object-contain"
                 fallbackPriority={mode === 'focus' ? 'alert' : 'calm'}
                 fallbackSize={80}
               />
