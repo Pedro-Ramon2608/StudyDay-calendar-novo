@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { CAT_MASCOT_BASE64 } from './catMascotData';
 import { CatIcon } from './CatIcon';
 
 interface CatAvatarProps {
@@ -16,30 +17,22 @@ export const CatAvatar: React.FC<CatAvatarProps> = ({
   fallbackPriority = 'calm',
   fallbackSize = 40,
 }) => {
-  // Caminhos possíveis para carregar a foto do mascote da pasta pública
-  const candidates = [
-    src,
-    '/assets/cat-mascot.jpeg',
-    '/assets/cat-mascot.jpg',
-    '/cat-mascot.jpeg',
-    '/cat-mascot.jpg',
-  ].filter(Boolean) as string[];
-
-  const [candidateIndex, setCandidateIndex] = useState(0);
+  const [imgSrc, setImgSrc] = useState<string>(src || CAT_MASCOT_BASE64);
   const [hasError, setHasError] = useState(false);
 
   const handleError = () => {
-    if (candidateIndex < candidates.length - 1) {
-      setCandidateIndex((prev) => prev + 1);
+    // Se um src alternativo falhar, recorre ao Base64 embutido
+    if (imgSrc !== CAT_MASCOT_BASE64) {
+      setImgSrc(CAT_MASCOT_BASE64);
     } else {
-      // Se nenhuma imagem externa foi encontrada no servidor, exibe o mascote vetorial
+      // Se até o Base64 falhar por qualquer motivo, mostra o ícone vetorial SVG
       setHasError(true);
     }
   };
 
-  if (hasError || candidates.length === 0) {
+  if (hasError) {
     return (
-      <div className="w-full h-full flex items-center justify-center bg-indigo-50/50">
+      <div className="w-full h-full flex items-center justify-center">
         <CatIcon priority={fallbackPriority} size={fallbackSize} />
       </div>
     );
@@ -47,7 +40,7 @@ export const CatAvatar: React.FC<CatAvatarProps> = ({
 
   return (
     <img
-      src={candidates[candidateIndex]}
+      src={imgSrc}
       alt={alt}
       className={className}
       onError={handleError}
@@ -56,5 +49,5 @@ export const CatAvatar: React.FC<CatAvatarProps> = ({
   );
 };
 
-export const catMascotImg = '/assets/cat-mascot.jpeg';
+export const catMascotImg = CAT_MASCOT_BASE64;
 export default CatAvatar;

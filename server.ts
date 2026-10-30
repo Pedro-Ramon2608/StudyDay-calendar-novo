@@ -11,6 +11,7 @@ import {
   deleteSession,
   getUserStudyState,
   saveUserStudyState,
+  isUsingPostgres,
 } from './server/db';
 import { User } from './src/types';
 
@@ -22,21 +23,26 @@ interface AuthRequest extends Request {
   token?: string;
 }
 
-function authMiddleware(req: AuthRequest, res: Response, next: NextFunction) {
+async function authMiddleware(req: AuthRequest, res: Response, next: NextFunction) {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({ error: 'Não autorizado. Faça login para continuar.' });
   }
 
   const token = authHeader.slice(7).trim();
-  const user = getUserByToken(token);
-  if (!user) {
-    return res.status(401).json({ error: 'Sessão expirada ou inválida.' });
-  }
+  try {
+    const user = await getUserByToken(token);
+    if (!user) {
+      return res.status(401).json({ error: 'Sessão expirada ou inválida.' });
+    }
 
-  req.user = user;
-  req.token = token;
-  next();
+    req.user = user;
+    req.token = token;
+    next();
+  } catch (err) {
+    console.error('Erro na validação do token:', err);
+    return res.status(500).json({ error: 'Erro ao validar sessão.' });
+  }
 }
 
 async function startServer() {
@@ -45,10 +51,20 @@ async function startServer() {
 
   app.use(express.json({ limit: '10mb' }));
 
+  // Endpoint de status do sistema e banco de dados
+  app.get('/api/system/status', (_req: Request, res: Response) => {
+    res.json({
+      status: 'ok',
+      database: isUsingPostgres ? 'postgresql_cloud' : 'sqlite_local',
+      persistent: isUsingPostgres,
+      timestamp: Date.now(),
+    });
+  });
+
   // === ROTAS DE AUTENTICAÇÃO ===
 
   // Cadastro de novo usuário
-  app.post('/api/auth/register', (req: Request, res: Response) => {
+  app.post('/api/auth/register', async (req: Request, res: Response) => {
     try {
       const { name, email, password } = req.body;
       if (!name || !email || !password) {
@@ -58,14 +74,14 @@ async function startServer() {
       const cleanEmail = String(email).trim().toLowerCase();
       const cleanName = String(name).trim();
 
-      const existing = findUserByEmail(cleanEmail);
+      const existing = await findUserByEmail(cleanEmail);
       if (existing) {
         return res.status(400).json({ error: 'Este e-mail já está em uso.' });
       }
 
       const passwordHash = hashPassword(String(password));
-      const user = createUser(cleanName, cleanEmail, passwordHash);
-      const token = createSession(user.id);
+      const user = await createUser(cleanName, cleanEmail, passwordHash);
+      const token = await createSession(user.id);
 
       return res.status(201).json({ user, token });
     } catch (err) {
@@ -75,7 +91,7 @@ async function startServer() {
   });
 
   // Login com e-mail e senha
-  app.post('/api/auth/login', (req: Request, res: Response) => {
+  app.post('/api/auth/login', async (req: Request, res: Response) => {
     try {
       const { email, password } = req.body;
       if (!email || !password) {
@@ -83,9 +99,9 @@ async function startServer() {
       }
 
       const cleanEmail = String(email).trim().toLowerCase();
-      const user = findUserByEmail(cleanEmail);
+      const user = await findUserByEmail(cleanEmail);
       if (!user) {
-        return res.status(401).json({ error: 'E-mail ou senha incorretos.' });
+        return res.status(401).json({ error: 'E-mail ou senha incorretos. Verifique os dados ou crie uma nova conta.' });
       }
 
       const passwordHash = hashPassword(String(password));
@@ -93,7 +109,7 @@ async function startServer() {
         return res.status(401).json({ error: 'E-mail ou senha incorretos.' });
       }
 
-      const token = createSession(user.id);
+      const token = await createSession(user.id);
       return res.json({
         user: { id: user.id, name: user.name, email: user.email },
         token,
@@ -110,20 +126,25 @@ async function startServer() {
   });
 
   // Logout
-  app.post('/api/auth/logout', authMiddleware, (req: AuthRequest, res: Response) => {
-    if (req.token) {
-      deleteSession(req.token);
+  app.post('/api/auth/logout', authMiddleware, async (req: AuthRequest, res: Response) => {
+    try {
+      if (req.token) {
+        await deleteSession(req.token);
+      }
+      return res.json({ success: true });
+    } catch (err) {
+      console.error('Erro no logout:', err);
+      return res.status(500).json({ error: 'Erro ao deslogar.' });
     }
-    return res.json({ success: true });
   });
 
   // === ROTAS DE DADOS DE ESTUDOS ===
 
   // Obter estado de estudos do usuário logado
-  app.get('/api/study/state', authMiddleware, (req: AuthRequest, res: Response) => {
+  app.get('/api/study/state', authMiddleware, async (req: AuthRequest, res: Response) => {
     try {
       const userId = req.user!.id;
-      const state = getUserStudyState(userId);
+      const state = await getUserStudyState(userId);
       return res.json(state);
     } catch (err) {
       console.error('Erro ao ler estado do estudo:', err);
@@ -132,11 +153,11 @@ async function startServer() {
   });
 
   // Salvar estado de estudos do usuário logado
-  app.put('/api/study/state', authMiddleware, (req: AuthRequest, res: Response) => {
+  app.put('/api/study/state', authMiddleware, async (req: AuthRequest, res: Response) => {
     try {
       const userId = req.user!.id;
       const newState = req.body;
-      saveUserStudyState(userId, newState);
+      await saveUserStudyState(userId, newState);
       return res.json({ success: true });
     } catch (err) {
       console.error('Erro ao salvar estado:', err);
@@ -145,7 +166,6 @@ async function startServer() {
   });
 
   // === VITE / STATIC MIDDLEWARES ===
-  // Servir pasta public para desenvolvimento e produção
   app.use('/public', express.static(path.resolve(__dirname, 'public')));
   app.use(express.static(path.resolve(__dirname, 'public')));
 
@@ -164,7 +184,7 @@ async function startServer() {
   }
 
   app.listen(Number(PORT), '0.0.0.0', () => {
-    console.log(`StudyDay server listening at http://0.0.0.0:${PORT}`);
+    console.log(`StudyDay server listening at http://0.0.0.0:${PORT} (${isUsingPostgres ? 'PostgreSQL' : 'SQLite'})`);
   });
 }
 

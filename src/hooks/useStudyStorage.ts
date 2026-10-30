@@ -3,206 +3,142 @@ import { AppStorageState, DayPlan, FutureTask, UsefulLink, Task, TaskPriority } 
 import { getTodayString, formatDateString, normalizeUrl } from '../utils/dateUtils';
 import { useAuth } from '../context/AuthContext';
 
-const STORAGE_KEY = 'studyday_app_storage_v2';
+const LEGACY_STORAGE_KEY = 'studyday_app_storage_v2';
 
-function getInitialFallbackData(): AppStorageState {
+function getStorageKey(userId?: string) {
+  return userId ? `studyday_storage_user_${userId}` : 'studyday_storage_guest';
+}
+
+function getInitialGuestData(): AppStorageState {
   const today = getTodayString();
-  const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1);
-  const yesterdayStr = formatDateString(yesterday);
-
   return {
     dayPlans: {
       [today]: {
         date: today,
-        subject: 'Arquitetura de Estudos & Pomodoro',
-        notes: 'Focar em sessões de 40 minutos com descansos de 5 minutos.',
+        subject: 'Bem-vindo ao StudyDay! 🐱',
+        notes: 'Crie uma conta para sincronizar suas tarefas na nuvem ou use o modo convidado neste navegador.',
         tasks: [
           {
-            id: 'task-1',
-            title: 'Estruturar tipos estritos e backend SQLite',
-            description: 'Garantir que os dados do usuário sincronizem em qualquer dispositivo.',
-            completed: true,
-            priority: 'done',
-            createdAt: Date.now() - 3600000,
-          },
-          {
-            id: 'task-2',
-            title: 'Configurar cronômetro Pomodoro (40m foco / 5m descanso)',
-            description: 'Adicionar feedback de som suave e controles de tempo personalizáveis.',
-            completed: true,
-            priority: 'urgent',
-            createdAt: Date.now() - 2500000,
-          },
-          {
-            id: 'task-3',
-            title: 'Organizar quadro de tarefas da semana atual',
-            description: 'Ver tudo o que precisa ser feito de segunda a domingo de relance.',
+            id: 'demo-task-1',
+            title: 'Experimentar o StudyDay (Modo Convidado)',
+            description: 'Você pode adicionar tarefas, usar o Pomodoro de 40 minutos e marcar itens como concluídos.',
             completed: false,
-            priority: 'alert',
-            createdAt: Date.now() - 1200000,
+            priority: 'calm',
+            createdAt: Date.now() - 1000000,
           },
         ],
         links: [
           {
-            id: 'link-1',
-            title: 'Documentação Oficial do React Hooks',
-            url: 'https://react.dev/reference/react',
-          },
-          {
-            id: 'link-2',
-            title: 'TypeScript Handbook - Generics & Interfaces',
-            url: 'https://www.typescriptlang.org/docs/handbook/2/generics.html',
-          },
-        ],
-      },
-      [yesterdayStr]: {
-        date: yesterdayStr,
-        subject: 'Estruturas de Dados e Algoritmos Básicos',
-        notes: 'Conceitos de tempo de complexidade O(n) e pilhas.',
-        tasks: [
-          {
-            id: 'task-y1',
-            title: 'Revisar Pilhas (Stacks) e Filas (Queues)',
-            description: 'Praticar conceitos fundamentais.',
-            completed: true,
-            priority: 'done',
-            createdAt: Date.now() - 90000000,
-          },
-          {
-            id: 'task-y2',
-            title: 'Implementar fila circular em TypeScript',
-            completed: true,
-            priority: 'done',
-            createdAt: Date.now() - 85000000,
-          },
-        ],
-        links: [
-          {
-            id: 'link-y1',
-            title: 'Visualgo - Animação de Estruturas de Dados',
-            url: 'https://visualgo.net/en',
+            id: 'demo-link-1',
+            title: 'Dica: Crie uma conta no botão Entrar / Conta',
+            url: 'https://github.com',
           },
         ],
       },
     },
     futureTasks: [
       {
-        id: 'ft-1',
-        title: 'Fazer curso de Docker e Containers',
-        description: 'Aprender a criar Dockerfile, gerenciar volumes e compor serviços.',
+        id: 'demo-ft-1',
+        title: 'Criar minha conta gratuita no StudyDay',
+        description: 'Assim suas tarefas ficam salvas no banco de dados e sincronizadas em qualquer dispositivo!',
         completed: false,
         priority: 'urgent',
-        links: [
-          {
-            id: 'link-f1',
-            title: 'Guia Inicial Docker Docs',
-            url: 'https://docs.docker.com/get-started/',
-          },
-        ],
-        createdAt: Date.now() - 40000000,
-      },
-      {
-        id: 'ft-2',
-        title: 'Entender Árvores Binárias de Busca (BST)',
-        description: 'Praticar percursos in-order, pre-order e resolver exercícios no LeetCode.',
-        completed: false,
-        priority: 'alert',
-        links: [
-          {
-            id: 'link-f2',
-            title: 'LeetCode - Tree Problems',
-            url: 'https://leetcode.com/tag/tree/',
-          },
-        ],
-        createdAt: Date.now() - 30000000,
-      },
-      {
-        id: 'ft-3',
-        title: 'Aprofundar em Web Performance e Core Web Vitals',
-        description: 'Dominar métricas LCP, CLS, INP e técnicas de compressão.',
-        completed: false,
-        priority: 'calm',
-        links: [
-          {
-            id: 'link-f3',
-            title: 'web.dev - Performance Guide',
-            url: 'https://web.dev/learn/performance/',
-          },
-        ],
-        createdAt: Date.now() - 20000000,
+        links: [],
+        createdAt: Date.now() - 500000,
       },
     ],
     globalLinks: [
-      { id: 'gl-1', title: 'LeetCode', url: 'https://leetcode.com' },
-      { id: 'gl-2', title: 'MDN Web Docs', url: 'https://developer.mozilla.org' },
-      { id: 'gl-3', title: 'Roadmap.sh - Trilhas de Estudo', url: 'https://roadmap.sh' },
-      { id: 'gl-4', title: 'GitHub Repositories', url: 'https://github.com' },
+      { id: 'demo-gl-1', title: 'Roadmap de Estudos', url: 'https://roadmap.sh' },
     ],
   };
+}
+
+function loadLocalData(userId?: string): AppStorageState {
+  const key = getStorageKey(userId);
+  try {
+    const stored = localStorage.getItem(key);
+    if (stored) {
+      const parsed = JSON.parse(stored) as AppStorageState;
+      if (parsed && typeof parsed === 'object' && parsed.dayPlans && Array.isArray(parsed.futureTasks)) {
+        return parsed;
+      }
+    }
+
+    // Se for guest e não tiver dados, tenta migrar o legado se existir
+    if (!userId) {
+      const legacy = localStorage.getItem(LEGACY_STORAGE_KEY);
+      if (legacy) {
+        const parsedLegacy = JSON.parse(legacy) as AppStorageState;
+        if (parsedLegacy && typeof parsedLegacy === 'object' && parsedLegacy.dayPlans) {
+          return parsedLegacy;
+        }
+      }
+    }
+  } catch (e) {
+    console.warn('Erro ao ler cache local:', e);
+  }
+  return userId ? { dayPlans: {}, futureTasks: [], globalLinks: [] } : getInitialGuestData();
 }
 
 export function useStudyStorage() {
   const { user, token } = useAuth();
 
-  const [state, setState] = useState<AppStorageState>(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored) as AppStorageState;
-        if (parsed && typeof parsed === 'object' && parsed.dayPlans && Array.isArray(parsed.futureTasks)) {
-          return parsed;
-        }
-      }
-    } catch (e) {
-      console.warn('Erro ao carregar dados do localStorage:', e);
-    }
-    return getInitialFallbackData();
-  });
-
+  const [state, setState] = useState<AppStorageState>(() => loadLocalData(user?.id));
   const [lastCompletedTaskTitle, setLastCompletedTaskTitle] = useState<string>('');
   const [pawTriggerCount, setPawTriggerCount] = useState<number>(0);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const currentUserIdRef = useRef<string | undefined>(user?.id);
 
-  // Sincroniza dados com o banco de dados remoto quando o usuário logar
+  // Quando o usuário muda (login / logout / troca de conta)
   useEffect(() => {
-    if (!token) return;
+    const prevUserId = currentUserIdRef.current;
+    currentUserIdRef.current = user?.id;
 
-    let isMounted = true;
-    async function fetchServerState() {
-      try {
-        const res = await fetch('/api/study/state', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (res.ok) {
-          const serverState = await res.json();
-          if (isMounted && serverState && serverState.dayPlans) {
-            setState(serverState);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(serverState));
-          }
-        }
-      } catch (err) {
-        console.warn('Erro ao carregar dados do banco de dados:', err);
-      }
+    if (prevUserId !== user?.id) {
+      // Carrega dados da conta nova ou do guest
+      const initialUserCache = loadLocalData(user?.id);
+      setState(initialUserCache);
     }
 
-    fetchServerState();
-    return () => {
-      isMounted = false;
-    };
+    // Se logado, busca os dados mais recentes do servidor
+    if (token && user?.id) {
+      let isMounted = true;
+      async function fetchServerState() {
+        try {
+          const res = await fetch('/api/study/state', {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (res.ok) {
+            const serverState = await res.json();
+            if (isMounted && serverState && serverState.dayPlans) {
+              setState(serverState);
+              const key = getStorageKey(user?.id);
+              localStorage.setItem(key, JSON.stringify(serverState));
+            }
+          }
+        } catch (err) {
+          console.warn('Erro ao carregar dados do servidor:', err);
+        }
+      }
+
+      fetchServerState();
+      return () => {
+        isMounted = false;
+      };
+    }
   }, [token, user?.id]);
 
-  // Salva no banco de dados e no localStorage a cada alteração
+  // Salva no localStorage e no servidor quando o estado muda
   useEffect(() => {
-    // Salva no localStorage imediatamente
+    const key = getStorageKey(user?.id);
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      localStorage.setItem(key, JSON.stringify(state));
     } catch (e) {
-      console.error('Erro ao salvar no localStorage:', e);
+      console.error('Erro ao salvar no cache local:', e);
     }
 
-    // Se estiver autenticado, salva no banco de dados SQLite com pequeno debounce
-    if (token) {
+    // Se estiver logado, sincroniza com o banco de dados (PostgreSQL/SQLite)
+    if (token && user?.id) {
       if (saveTimeoutRef.current) {
         clearTimeout(saveTimeoutRef.current);
       }
@@ -217,7 +153,7 @@ export function useStudyStorage() {
             body: JSON.stringify(state),
           });
         } catch (err) {
-          console.warn('Erro ao persistir no banco de dados:', err);
+          console.warn('Erro ao salvar no banco de dados:', err);
         }
       }, 400);
     }
@@ -227,7 +163,7 @@ export function useStudyStorage() {
         clearTimeout(saveTimeoutRef.current);
       }
     };
-  }, [state, token]);
+  }, [state, token, user?.id]);
 
   // Recupera o plano de um dia (ou template vazio)
   const getDayPlan = useCallback(
@@ -608,7 +544,7 @@ export function useStudyStorage() {
   }, []);
 
   const resetToDefaults = useCallback(() => {
-    const initial = getInitialFallbackData();
+    const initial = getInitialGuestData();
     setState(initial);
   }, []);
 

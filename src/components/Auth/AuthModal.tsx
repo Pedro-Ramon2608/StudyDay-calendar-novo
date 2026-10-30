@@ -147,9 +147,26 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         {/* Formulário */}
         <div className="p-5 space-y-4">
           {error && (
-            <div className="p-2.5 rounded-lg bg-rose-50 border border-rose-200 text-xs text-rose-700 flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
-              <span>{error}</span>
+            <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-700 space-y-2">
+              <div className="flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
+                <span className="font-medium">{error}</span>
+              </div>
+              {mode === 'login' && (
+                <div className="pt-1 border-t border-rose-200/60 flex items-center justify-between">
+                  <span className="text-[11px] text-rose-600">Ainda não criou a conta neste banco?</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMode('register');
+                      setError('');
+                    }}
+                    className="font-bold underline text-indigo-700 hover:text-indigo-900 text-[11px]"
+                  >
+                    Criar conta agora →
+                  </button>
+                </div>
+              )}
             </div>
           )}
 
